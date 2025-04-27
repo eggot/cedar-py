@@ -1,0 +1,13 @@
+import stdlib.h
+
+// The type of freshly allocated memory
+type AllocatedMemory(void* ptr)
+
+
+type Context(
+	AllocatedMemory(int num_bytes, uint flags)[] allocators
+)
+
+AllocatedMemory malloc(int num_bytes, uint flags) {
+	return AllocatedMemory(stdlib.malloc(num_bytes))
+}

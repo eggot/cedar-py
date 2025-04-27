@@ -1,0 +1,48 @@
+
+
+int my_function(MyType* m) {
+    return 22
+}
+
+type MyType(int x, int y)
+
+export type Option {
+    FirstOption(int i)
+    SecondOption(i16 a, i16 b, i8 c, float f)
+    ThirdOption(bool b)
+}
+
+Symbol my_symbol() {
+    return #Failure
+}
+
+type UnusedWillNotCauseConflict(bool z)
+
+
+
+
+export
+type Number {
+    Positive(int value) = 0xabcdef
+    Negative(int value) = 32618
+}
+
+export
+int __packsize__(Number c) {
+    return 4
+}
+
+export
+void __pack__(Number n, void* dest) {
+    *cast(int*)dest = n.value
+}
+
+export
+Number __unpack__(void* src) {
+    let n = *cast(int*)src
+    if n < 0 {
+        return Negative(n)
+    } else {
+        return Positive(n)
+    }
+}

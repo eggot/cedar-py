@@ -1,0 +1,240 @@
+import core/io.ce
+import stdio.h
+import stdlib.h
+
+// Importing other files means that the declarations in the imported file is placed in a namepace.
+// By default, the namespace is the same as the filename, but it can be given explicitly.
+import dependency.ce in stuff
+
+// Declarations from multiple files can be imported into the same namespace. The compiler will
+// only emit an error for name clash if the code actually attempts to use a name that is clashing.
+import cfile.h in stuff
+
+// The implicit namespace is the namespace where all the stuff defined inside this file lives.
+// It's possible to import directly into that namespace using the syntax below.
+import more_things.ce in implicit
+
+void use_c_code(int zzz) {
+    let x = stuff.Foobar(stuff.MY_INT, stuff.MY_FLOAT)
+    stuff.print_foobar(x)
+}
+
+type TypeWithExplicitTag { 
+    TypeWithTag10(int x) = 10
+    TypeWithTag99(float x) = 99
+}
+
+type TypeWithoutTag {
+    Tagless0(int x) = void
+    Tagless1(float y)
+}
+
+type WithNestedDataType(stuff.Option opt, int foo)
+type WithPointer(stuff.Option* opt, stuff.Foobar* foobar, (float, float) coord)
+
+void use_stdio() {
+    let f1 = stdio.fopen("crise-file.txt", cstring("w"))
+    stdio.fputs("Test text!\n", f1)
+    stdio.fclose(f1)
+    stdio.printf("Hello, world! My number: %d\n", 999)
+}
+
+int implicit_argument(implicit stuff.Option option, int i) {
+    if option case stuff.FirstOption(let j) {
+        return i + j
+    }
+    return -1
+}
+
+int implicit_argument_top(implicit stuff.Option option, implicit int xx) {
+    return xx + implicit_argument(999)
+}
+
+float get_first_float(float[] array) {
+    return 0.0
+}
+
+float? maybe_a_float(bool give_float) {
+    if give_float { return 123456.75 } else { return null }
+}
+
+float? maybe_maybe_a_float(bool a) {
+    return maybe_a_float(a)
+}
+
+type WithCommonField {
+    Thing1(int common, float x0)
+    Thing2(int common, bool x1)
+    Thing3(int x2, int common)
+    Thing4(bool x3, i16 x4, int common)
+}
+
+
+int main(int argc, byte** argv) {
+    let thing_with_common = Thing3(88, 99)
+    stdio.printf("common field = %d (should be 99)\n", thing_with_common.common)
+
+
+
+    let a_float = maybe_maybe_a_float(true)
+
+    if a_float {
+        stdio.printf("a_float holds a float, its value is %f\n", a_float)
+    } else {
+        stdio.printf("a_float is empty\n")
+    }
+
+    if a_float case null {
+        stdio.printf("a_float pattern matched on null\n")
+    }
+    
+    if a_float case Some(let f) {
+        stdio.printf("a_float pattern matched on float: %f\n", f)
+    }
+
+    let array = [11, 22, 33]
+    stdio.printf("array[1]=%d, array.length=%d\n", array[1], array.length);
+
+    stdio.printf("foo=%f\n", get_first_float([]));
+    use_stdio()
+    use_c_code(36781)
+    let text = "Something that is textual"
+    //stuff.print_int(function_in_more_things())
+    //let opt = stuff.SecondOption(99, 88, 77, 0.125)
+    let implicit opt = stuff.FirstOption(77700000)
+    let x = WithNestedDataType(opt, 109)
+    let foobar = stuff.Foobar(stuff.MY_INT, stuff.MY_FLOAT)
+    let wptr = WithPointer(&opt, &foobar, (25.0, 125.0))
+
+    let foobar_ptr = &foobar
+    let foobar_ptr_a = foobar_ptr.a
+
+    if x case WithNestedDataType(stuff.FirstOption(let i), 109) {
+        //stuff.print_symbol(#"It matches!".value)
+        //stuff.print_int(i)
+    }
+
+    if wptr case WithPointer(stuff.FirstOption(let i), stuff.Foobar(let a, let b), (let x, let y)) {
+        //stuff.print_symbol(#"It matches with pointer!".value)
+        //stuff.print_int(i)
+        //stuff.print_int(a)
+        //stuff.print_float(b)
+        //stuff.print_float(x)
+        //stuff.print_float(y)
+        let implicit qwerty = 6000
+        stdio.printf("from function with implicits; return = %d\n", implicit_argument_top())
+    }
+
+    stdio.printf("from function with implicits; return = %d\n", implicit_argument_top(7000))
+
+    let foobark = if true { let ttt = 10; ttt } else { 20 }
+
+    let my_array = [1]
+    my_array.append(2)
+    my_array.append(3)
+
+    for bajs in 0..my_array.length {
+        stdio.printf("my_array[%d] = %d\n", bajs, my_array[bajs])
+    }
+
+    if my_array == [1,2,3] {
+        stdio.printf("EQUALS!\n")
+    }
+
+    let n99 = for qqq in 0..100 {
+        let r = for www in 0..qqq {
+            if qqq + www > 100 { break (qqq, www) }
+        }
+        if r {
+            break r
+        }
+    }
+    if n99 case Some((let left, let right)) {
+        stdio.printf("value from loop = (%d, %d)\n", left, right)
+    }
+
+
+    let acc = for qqq in 0..666 {
+        if qqq % 77 == 0 {
+            continue qqq * 2
+        }
+    }
+    stdio.printf("array from loop = [%d, %d, ...] (length = %d)\n", acc[0], acc[1], acc.length)
+
+    let for_else = for eee in 0..7 {
+        if eee > 10 {
+            break 100
+        }
+    } else -100
+    
+    stdio.printf("for with else: %d\n", for_else)
+
+    let ffff = if false { 888 }
+
+    let ff = ffff else { stdio.printf("well, this didn't give me much..."); -888 }
+    stdio.printf("ff=%d\n", ff)
+
+    io.print("My name is World, Hello World!\n")
+    stdio.printf("test\n")
+
+    let counter = 0
+    while counter < 10 {
+        counter = counter + 1
+        stdio.printf("counter=%d\n", counter)
+        if counter < 7 {
+            continue
+        }
+        if counter > 5 {
+            break
+        }
+    }
+
+    counter = 0 
+    let while_result = while counter < 10 {
+        if counter > 4 {
+            break counter * 2 - 1
+        }
+        counter = counter + 1
+    }
+    if while_result {
+        stdio.printf("while counter result = %d\n", while_result)
+    }
+
+    if "foobar" case /(foo|bar)+/ {
+        stdio.printf("regex match: ")
+        io.print("Match!")
+        stdio.printf("\n")
+    }
+
+
+    let re_func = /(?<x>foo|bar)/
+    let re_result = re_func("foo")
+    if re_result case Some((x: let value)) {
+        stdio.printf("Regex match called as function\n")
+        io.print(value)
+        stdio.printf("\n")
+    }
+
+    let my_float = 999.25
+    let my_int = *cast(int*)&my_float
+    stdio.printf("The float %f interpreted as an int is %d\n", my_float, my_int)
+
+
+    let my_number = stuff.Positive(20)
+    let my_pointer = cast(stuff.Number*) stdlib.malloc(my_number.__packsize__())
+    *my_pointer = my_number
+
+    if my_pointer case stuff.Positive(let ppp) {
+        stdio.printf("The positive integer is %d", ppp)
+    }
+    else if my_pointer case stuff.Negative(let ppp) {
+        stdio.printf("The negative integer is %d", ppp)
+    }
+    let qqqqqq = *my_pointer
+    stdio.printf(", with tag = %d\n", qqqqqq.__tag__)
+
+
+    let tagless = Tagless0(7878)
+    return 0
+}
+

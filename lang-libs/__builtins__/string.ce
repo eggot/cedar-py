@@ -1,0 +1,11 @@
+
+
+export type String(byte[] data)
+
+export int length(String s) {
+    return s.data.length
+}
+
+export byte __getindex__(String s, int index) {
+    return s.data[index]
+}

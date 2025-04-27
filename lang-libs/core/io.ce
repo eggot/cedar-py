@@ -1,0 +1,7 @@
+import stdio.h
+
+export void print(String s) {
+    for i in 0..s.length() {
+        stdio.putchar(s[i])
+    }
+}
